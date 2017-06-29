@@ -1,44 +1,34 @@
-var mongoose = require('mongoose');
+var express = require('express');
+var bodyParser = require('body-parser');
 
-mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost:27017/TodoApp');
+var {mongoose} = require('./db/mongoose');
+var {Todo} = require('./models/todo');
+var {User} = require('./models/user');
 
-var Todo = mongoose.model('Todo',{
-    text:{
-        type: String,
-        required: true,
-        minLength: 1,
-        trim: true
-    },
-    completed:{
-        type: Boolean,
-        default: false
-    },
-    completedAt:{
-        type: Number,
-        default: null
-    }
+const port = process.env.PORT || 3000; 
+
+var app = express();
+
+app.use(bodyParser.json());
+app.post('/todos', (req,res)=>{
+    // console.log(req.body);
+    var todo = new Todo({
+        text: req.body.text
+    });
+
+    todo.save().then((doc)=>res.status(200).send(doc)).catch(err=>res.status(400).send(err));
+
 });
 
-var newTodo = new Todo({
-    text:'Cook Dinner'
-});
-
-var otherTodo = new Todo({
-    text: '  Other   ',
-    completedAt: 12
+app.listen(port,()=>{
+    console.log(`Server listening on port ${port}`);
 });
 
 
 
-// otherTodo.save().then(doc=>console.log(doc)).catch(err=>console.log(err));
 
 
-var User = new mongoose.model('User',{
-    email:{
-        type: String,
-        minLength: 1,
-        required: true,
-        trim: true
-    }
-});
+
+
+
+
