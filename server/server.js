@@ -5,13 +5,18 @@ mongoose.connect('mongodb://localhost:27017/TodoApp');
 
 var Todo = mongoose.model('Todo',{
     text:{
-        type: String
+        type: String,
+        required: true,
+        minLength: 1,
+        trim: true
     },
     completed:{
-        type: Boolean
+        type: Boolean,
+        default: false
     },
     completedAt:{
-        type: Number
+        type: Number,
+        default: null
     }
 });
 
@@ -20,11 +25,20 @@ var newTodo = new Todo({
 });
 
 var otherTodo = new Todo({
-    text: 'Other todo',
-    completed: false,
+    text: '  Other   ',
     completedAt: 12
 });
 
 
 
-otherTodo.save().then(doc=>console.log(doc)).catch(err=>console.log(err));
+// otherTodo.save().then(doc=>console.log(doc)).catch(err=>console.log(err));
+
+
+var User = new mongoose.model('User',{
+    email:{
+        type: String,
+        minLength: 1,
+        required: true,
+        trim: true
+    }
+});
