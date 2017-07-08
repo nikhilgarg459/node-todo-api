@@ -50,12 +50,12 @@ UserSchema.methods.generateAuthToken = function () {
     });
 }
 
-UserSchema.methods.removeToken = function(token){
+UserSchema.methods.removeToken = function (token) {
     var user = this;
-   return user.update({
-        $pull:{  
-            tokens:{
-                token 
+    return user.update({
+        $pull: {
+            tokens: {
+                token
             }
         }
     });
