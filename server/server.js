@@ -4,6 +4,8 @@ const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
 
+const fs = require('fs');
+
 const { ObjectID } = require('mongodb');
 
 var { mongoose } = require('./db/mongoose');
@@ -15,7 +17,23 @@ const port = process.env.PORT;
 
 var app = express();
 
+app.use((req,res,next)=>{
+    var now= new Date().toString();
+
+    var log = `${now}: ${req.method} ${req.url}`;
+    console.log(log);
+
+    fs.appendFile('server.log',log + '\n',(err)=>{
+        if(err){
+            console.log("Unable to append to log file");
+        }
+    });
+    next();
+});
+
 app.use(bodyParser.json());
+
+
 
 app.post('/todos', (req, res) => {
     // console.log(req.body);
@@ -26,6 +44,7 @@ app.post('/todos', (req, res) => {
     todo.save().then((doc) => {
         res.status(200).send(doc)
     }).catch((err) => {
+
         res.status(400).send(err)
     });
 
@@ -129,9 +148,16 @@ app.post('/users/login', (req, res) => {
             res.header('x-auth', token).send(user);
         })
     }).catch((e) => {
-        console.log(e);
         res.status(400).send();
     });;
+});
+
+app.delete('/users/me/token', authenticate, (req, res)=>{
+    req.user.removeToken(req.token).then(()=>{
+        res.status(200).send();
+    }).catch((err)=>{
+        res.status(400).send();
+    });
 });
 
 app.listen(port, () => {
