@@ -17,14 +17,14 @@ const port = process.env.PORT;
 
 var app = express();
 
-app.use((req,res,next)=>{
-    var now= new Date().toString();
+app.use((req, res, next) => {
+    var now = new Date().toString();
 
     var log = `${now}: ${req.method} ${req.url}`;
     console.log(log);
 
-    fs.appendFile('server.log',log + '\n',(err)=>{
-        if(err){
+    fs.appendFile('server.log', log + '\n', (err) => {
+        if (err) {
             console.log("Unable to append to log file");
         }
     });
@@ -35,10 +35,10 @@ app.use(bodyParser.json());
 
 
 
-app.post('/todos', (req, res) => {
-    // console.log(req.body);
+app.post('/todos', authenticate, (req, res) => {
     var todo = new Todo({
-        text: req.body.text
+        text: req.body.text,
+        _creator: req.user._id
     });
 
     todo.save().then((doc) => {
@@ -50,8 +50,11 @@ app.post('/todos', (req, res) => {
 
 });
 
-app.get('/todos', (req, res) => {
-    Todo.find({}).then((todos) => {
+app.get('/todos', authenticate, (req, res) => {
+
+    Todo.find({
+        _creator: req.user._id
+    }).then((todos) => {
         res.status(200).send({ todos });
     }).catch((err) => {
         res.status(400).send(err);
@@ -152,10 +155,10 @@ app.post('/users/login', (req, res) => {
     });;
 });
 
-app.delete('/users/me/token', authenticate, (req, res)=>{
-    req.user.removeToken(req.token).then(()=>{
+app.delete('/users/me/token', authenticate, (req, res) => {
+    req.user.removeToken(req.token).then(() => {
         res.status(200).send();
-    }).catch((err)=>{
+    }).catch((err) => {
         res.status(400).send();
     });
 });
