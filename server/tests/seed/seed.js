@@ -14,14 +14,20 @@ const users = [
         tokens: [
             {
                 access: 'auth',
-                token: jwt.sign({ _id: userOneId.toHexString(), access:'auth' }, 'abc123').toString()
+                token: jwt.sign({ _id: userOneId, access:'auth' }, 'abc123').toString()
             }
         ]
     },
     {
         _id: userTwoId,
         email: 'niedkhil@abc.com',
-        password: '1e2345677'
+        password: '1e2345677',
+        tokens: [
+            {
+                access: 'auth',
+                token: jwt.sign({ _id: userTwoId, access:'auth' }, 'abc123').toString()
+            }
+        ]
     }
 ];
 
